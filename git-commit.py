@@ -2,6 +2,7 @@
 import subprocess
 import requests
 import json
+import config
 
 def get_git_diff():
     result = subprocess.run(["git", "diff"], stdout=subprocess.PIPE)
@@ -22,7 +23,24 @@ def generate_commit_message(diff):
     }
 
     response = requests.post('https://api.openai.com/v1/engines/gpt-4.0-turbo/completions', headers=headers, json=data)
-    return response.json()['choices'][0]['text'].strip()
+    
+    # Check if the response is successful
+    if response.status_code != 200:
+        print(f"Error: Received status code {response.status_code}")
+        print("Response content:", response.text)
+        return False, "Error in generating commit message"
+
+    try:
+        return True, response.json()['choices'][0]['text'].strip()
+    except KeyError:
+        print("Error: 'choices' key not found in response.")
+        print("Response content:", response.text)
+        return False, "Error in generating commit message"
+
+    except json.JSONDecodeError:
+        print("Error: Unable to decode JSON response.")
+        print("Response content:", response.text)
+        return False, "Error in generating commit message"
 
 def main():
     diff = get_git_diff()
@@ -30,7 +48,10 @@ def main():
         print("No changes detected.")
         return
 
-    commit_message = generate_commit_message(diff)
+    error, commit_message = generate_commit_message(diff)
+    if not error:
+        print("Error in generating commit message.")
+        return
     print("Suggested commit message:\n")
     print(commit_message)
     confirmation = input("\nDo you want to proceed with this commit message? (Y/n): ")
