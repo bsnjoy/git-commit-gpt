@@ -21,23 +21,13 @@ def clean_string(input_string):
     return re.sub(pattern, '', input_string)
 
 def generate_commit_message(diff):
-    prompt = f'''Write a comment, which I will put in git commit command for changes below git diff.
- Include human readable description of what was changed. 
- Don't write which files were changed. 
- 1. output with no introduction, no explaintation, only comment.
- 2. DONT MAKE ANY MISTAKES, check if you did any
- 3. only return comment, and nothing else.
- 4. no DOCUMENATION IN THE OUTPUT
-
-git diff:\n{diff}'''
-
-    completion = openai.ChatCompletion.create( # Change the function Completion to ChatCompletion
-  model = config.OPENAI_API_MODEL,
-  messages = [ # Change the prompt parameter to the messages parameter
-    {"role": "system", "content": "You are a helpful assistant."},
-    {'role': 'user', 'content': prompt}
-  ],
-  temperature = 0  
+    completion = openai.ChatCompletion.create(
+    model = config.OPENAI_API_MODEL,
+    messages = [ # Change the prompt parameter to the messages parameter
+        {"role": "system", "content": "You are a helpful assistant."},
+        {'role': 'user', 'content': f'{config.prompt}{diff}'}
+    ],
+    temperature = 0
 )
     
     try:
