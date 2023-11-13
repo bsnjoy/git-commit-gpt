@@ -3,6 +3,7 @@ import subprocess
 import json
 import config
 import openai
+import re
 
 openai.api_key = config.OPENAI_API_KEY
 
@@ -10,9 +11,18 @@ def get_git_diff():
     result = subprocess.run(["git", "diff"], stdout=subprocess.PIPE)
     return result.stdout.decode()
 
+def clean_string(input_string):
+    # This regular expression matches any non-letter and non-number characters
+    # at the beginning (^) or end ($) of the string.
+    pattern = r'^[^A-Za-z0-9]+|[^A-Za-z0-9]+$'
+
+    # The re.sub() function replaces the matched patterns with an empty string,
+    # effectively removing them.
+    return re.sub(pattern, '', input_string)
+
 def generate_commit_message(diff):
     prompt = f'''Write a comment, which I will put in git commit command for changes below git diff.
- Include description of what was changed so that user, who is not familiar with the programming will understand what has been updated. 
+ Include human readable description of what was changed. 
  Don't write which files were changed. 
  1. output with no introduction, no explaintation, only comment.
  2. DONT MAKE ANY MISTAKES, check if you did any
@@ -31,7 +41,7 @@ git diff:\n{diff}'''
 )
     
     try:
-        return True, completion.choices[0].message.content
+        return True, clean_string(completion.choices[0].message.content)
     except KeyError:
         print("Error: 'choices' key not found in response.")
         print("Response content:", completion.text)
