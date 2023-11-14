@@ -8,7 +8,12 @@ and AI will create commit message for you and push it in repository
 git clone https://github.com/bsnjoy/git-commit-gpt.git
 cd git-commit-gpt
 pip install -r requirements.txt
+cp config.py.sample config.py
+# Edit config.py and put your OPENAI_API_KEY
 
 # Execute below command and put result command in .bashrc or .zshrc or other file whie is loaded when new shell executed. To make gg work in current shell, run it here also.
 echo "alias gg=`pwd`/git-commit.py"
+
+# Execute like so:
+gg
 ```
