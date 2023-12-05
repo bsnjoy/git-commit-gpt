@@ -2,10 +2,14 @@
 import subprocess
 import json
 import config
-import openai
+from openai import OpenAI
 import re
 
-openai.api_key = config.OPENAI_API_KEY
+client = OpenAI(api_key=config.OPENAI_API_KEY)
+
+def get_git_status():
+    result = subprocess.run(["git", "status"], stdout=subprocess.PIPE)
+    return result.stdout.decode()
 
 def get_git_diff():
     result = subprocess.run(["git", "diff"], stdout=subprocess.PIPE)
@@ -20,15 +24,15 @@ def clean_string(input_string):
     # effectively removing them.
     return re.sub(pattern, '', input_string)
 
-def generate_commit_message(diff):
-    completion = openai.ChatCompletion.create(
-    model = config.OPENAI_API_MODEL,
-    messages = [ # Change the prompt parameter to the messages parameter
-        {"role": "system", "content": "You are a helpful assistant."},
-        {'role': 'user', 'content': f'{config.prompt}{diff}'}
-    ],
-    temperature = 0
-)
+def generate_commit_message(git_status, git_diff):
+    completion = client.chat.completions.create(
+        model = config.OPENAI_API_MODEL,
+        messages = [ # Change the prompt parameter to the messages parameter
+            {"role": "system", "content": "You are a helpful assistant."},
+            {'role': 'user', 'content': config.PROMPT.format(git_status, git_diff)}
+        ],
+        temperature = 0
+    )
     
     try:
         return True, clean_string(completion.choices[0].message.content)
@@ -43,12 +47,13 @@ def generate_commit_message(diff):
         return False, "Error in generating commit message"
 
 def main():
-    diff = get_git_diff()
-    if not diff:
+    git_status = get_git_status()
+    git_diff = get_git_diff()
+    if not git_status and not git_diff :
         print("No changes detected.")
         return
 
-    error, commit_message = generate_commit_message(diff)
+    error, commit_message = generate_commit_message(git_status, git_diff)
     if not error:
         print("Error in generating commit message.")
         return
