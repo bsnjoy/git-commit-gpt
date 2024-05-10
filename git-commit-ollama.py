@@ -27,21 +27,12 @@ def generate_commit_message(git_status, git_diff):
     response = client.chat(
         model=config.OLLAMA_MODEL,
         messages = [ # Change the prompt parameter to the messages parameter
-            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "system", "content": "You are a git comment generator."},
             {'role': 'user', 'content': config.PROMPT.format(git_status, git_diff)}
         ],
+        options = {"temperature": 0, "top_p": 0, "top_k": 1},
         # temperature=0
     )
-    #print(response['message']['content'])
-
-    # completion = client.chat.completions.create(
-    #     model = config.OPENAI_API_MODEL,
-    #     messages = [ # Change the prompt parameter to the messages parameter
-    #         {"role": "system", "content": "You are a helpful assistant."},
-    #         {'role': 'user', 'content': config.PROMPT.format(git_status, git_diff)}
-    #     ],
-    #     temperature = 0
-    # )
     
     try:
         return True, clean_string(response['message']['content'])
