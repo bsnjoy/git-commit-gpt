@@ -12,7 +12,7 @@ cp config.py.sample config.py
 # Edit config.py and put your OPENAI_API_KEY
 
 # Execute below command and put result command in .profile .bashrc and/or .zshrc or other file whie is loaded when new shell executed. To make gg work in current shell, run it here also.
-echo "alias gg=`pwd`/git-commit.py"
+echo "alias gg=`pwd`/git-commit-ollama.py"
 
 # Execute like so:
 gg
