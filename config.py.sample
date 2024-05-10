@@ -7,12 +7,13 @@ OLLAMA_MODEL = 'command-r'
 
 SYSTEM_MESSAGE = "You are a git comment generator."
 PROMPT = '''Write a comment, which I will put in git commit command for changes below git status and git diff.
- Include human readable description of what was changed. 
- Don't write which files were changed. 
- 1. output with no introduction, no explaintation, only comment.
- 2. DONT MAKE ANY MISTAKES, check if you did any
- 3. only return comment, and nothing else.
- 4. no DOCUMENATION IN THE OUTPUT
+Include human readable description of what was changed.
+Don't write which files were changed.
+1. output with no introduction, no explaintation, only comment.
+2. DONT MAKE ANY MISTAKES, check if you did any
+3. only return comment, and nothing else.
+4. Code started with - is removed, code started with + is added.
+5. no DOCUMENATION IN THE OUTPUT
 
 git status:
 {}
