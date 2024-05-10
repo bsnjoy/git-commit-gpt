@@ -15,9 +15,11 @@ Don't write which files were changed.
 4. Code started with - is removed, code started with + is added.
 5. no DOCUMENATION IN THE OUTPUT
 
-git status:
+---git status output start---
 {}
+---git status output end---
 
-git diff:
+---git diff output start---
 {}
+---git diff output end---
 '''
