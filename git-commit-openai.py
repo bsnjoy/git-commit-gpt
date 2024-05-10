@@ -28,7 +28,7 @@ def generate_commit_message(git_status, git_diff):
     completion = client.chat.completions.create(
         model = config.OPENAI_API_MODEL,
         messages = [ # Change the prompt parameter to the messages parameter
-            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "system", "content": config.SYSTEM_MESSAGE},
             {'role': 'user', 'content': config.PROMPT.format(git_status, git_diff)}
         ],
         temperature = 0

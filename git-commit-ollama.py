@@ -27,7 +27,7 @@ def generate_commit_message(git_status, git_diff):
     response = client.chat(
         model=config.OLLAMA_MODEL,
         messages = [ # Change the prompt parameter to the messages parameter
-            {"role": "system", "content": "You are a git comment generator."},
+            {"role": "system", "content": config.SYSTEM_MESSAGE},
             {'role': 'user', 'content': config.PROMPT.format(git_status, git_diff)}
         ],
         options = {"temperature": 0, "top_p": 0, "top_k": 1},
