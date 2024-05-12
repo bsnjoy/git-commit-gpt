@@ -5,6 +5,8 @@ import config
 import re
 import ollama
 
+prefix = "Here's the one liner comment for the changes:"
+
 def get_git_status():
     result = subprocess.run(["git", "status"], stdout=subprocess.PIPE)
     return result.stdout.decode()
@@ -57,7 +59,14 @@ def main():
     if not error:
         print("Error in generating commit message.")
         return
-    print("Suggested commit message:\n")
+    
+    print("Message before strip:")
+    print(commit_message)
+
+    if commit_message.startswith(prefix):
+        commit_message = commit_message[len(prefix):].strip()
+
+    print("\nSuggested commit message:")
     print(commit_message)
     confirmation = input("\nDo you want to proceed with this commit message? (Y/n): ")
 
