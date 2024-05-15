@@ -30,6 +30,10 @@ def generate_commit_message(git_status, git_diff):
         model=config.OLLAMA_MODEL,
         messages = [ # Change the prompt parameter to the messages parameter
             {"role": "system", "content": config.SYSTEM_MESSAGE},
+            {'role': 'user', 'content': config.EXAMPLE_USER_1},
+            {'role': 'assistant', 'content': config.EXAMPLE_ASSYSTANT_1},
+            # {'role': 'user', 'content': config.EXAMPLE_USER_2},
+            # {'role': 'assistant', 'content': config.EXAMPLE_ASSYSTANT_2},
             {'role': 'user', 'content': config.PROMPT.format(git_status, git_diff)}
         ],
         options = {"temperature": 0, "top_p": 0, "top_k": 1},
@@ -55,24 +59,29 @@ def main():
         print("No changes detected.")
         return
 
-    error, commit_message = generate_commit_message(git_status, git_diff)
+    error, command = generate_commit_message(git_status, git_diff)
     if not error:
         print("Error in generating commit message.")
         return
-    
-    print("Message before strip:")
-    print(commit_message)
 
-    if commit_message.startswith(prefix):
-        commit_message = commit_message[len(prefix):].strip()
-
-    print("\nSuggested commit message:")
-    print(commit_message)
-    confirmation = input("\nDo you want to proceed with this commit message? (Y/n): ")
+    command = command.split('\n')[0].strip()
+    # ensure the command ends with a double quote "
+    if command[-1] != '"':
+        command += '"'
+    print(command)
+    confirmation = input("\nDo you want to proceed with this command? (Y/n): ")
 
     if confirmation.lower() in ['y', 'yes', '']:
-        subprocess.run(["git", "commit", "-am", commit_message])
-        print("Commit successful.")
+#        subprocess.run(["git", "commit", "-am", commit_message])
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+# Check the result
+        if result.returncode == 0:
+            print("Commit successful.")
+            print("Output:", result.stdout)
+        else:
+            print("Commit failed.")
+            print("Error:", result.stderr)
+
         subprocess.run(["git", "push"])
         print("Push successful.")
     else:
